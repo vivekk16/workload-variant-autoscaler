@@ -87,6 +87,7 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `variantCost` _string_ | VariantCost specifies the cost per replica for this variant (used in saturation analysis). | 10.0 | Optional: \{\} <br />Pattern: `^\d+(\.\d+)?$` <br /> |
+| `behavior` _[HorizontalPodAutoscalerBehavior](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#horizontalpodautoscalerbehavior-v2-autoscaling)_ | Behavior configures the HPA scaling behavior policies (scale-up and scale-down).<br />When omitted, default Kubernetes HPA scaling behavior is used.<br />Applied directly to HPA, or passed through to KEDA's underlying HPA via<br />spec.advanced.horizontalPodAutoscalerConfig.behavior. |  | Optional: \{\} <br /> |
 
 
 #### VariantAutoscalingList
@@ -127,6 +128,7 @@ _Appears in:_
 | `minReplicas` _integer_ | MinReplicas is the lower bound on the number of replicas for this variant.<br />A value of 0 enables scale-to-zero when the model is idle.<br />Defaults to 1, preserving existing behavior for VAs that omit this field. | 1 | Minimum: 0 <br />Optional: \{\} <br /> |
 | `maxReplicas` _integer_ | MaxReplicas is the upper bound on the number of replicas for this variant.<br />The autoscaler will never scale beyond this value regardless of load. | 10 | Minimum: 1 <br /> |
 | `variantCost` _string_ | VariantCost specifies the cost per replica for this variant (used in saturation analysis). | 10.0 | Optional: \{\} <br />Pattern: `^\d+(\.\d+)?$` <br /> |
+| `behavior` _[HorizontalPodAutoscalerBehavior](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#horizontalpodautoscalerbehavior-v2-autoscaling)_ | Behavior configures the HPA scaling behavior policies (scale-up and scale-down).<br />When omitted, default Kubernetes HPA scaling behavior is used.<br />Applied directly to HPA, or passed through to KEDA's underlying HPA via<br />spec.advanced.horizontalPodAutoscalerConfig.behavior. |  | Optional: \{\} <br /> |
 
 
 #### VariantAutoscalingStatus
