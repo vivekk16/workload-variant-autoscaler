@@ -47,7 +47,7 @@ type VariantAutoscalingSpec struct {
 	// MaxReplicas is the upper bound on the number of replicas for this variant.
 	// The autoscaler will never scale beyond this value regardless of load.
 	// +kubebuilder:validation:Minimum=1
-	// +kubebuilder:default=10
+	// +kubebuilder:default=2
 	MaxReplicas int32 `json:"maxReplicas"`
 
 	// VariantAutoscalingConfigSpec holds optional tuning fields that integrators can embed.

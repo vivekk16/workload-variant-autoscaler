@@ -33,7 +33,7 @@ func makeValidVA() *VariantAutoscaling {
 				Name: "va-sample-deployment",
 			},
 			ModelID:     "model-123",
-			MaxReplicas: 10,
+			MaxReplicas: 2,
 		},
 		Status: VariantAutoscalingStatus{
 			// CurrentAlloc: Allocation{...} -- Removed

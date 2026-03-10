@@ -112,7 +112,7 @@ func buildVariantAutoscaling(namespace, name, deploymentName, modelID, accelerat
 				Name:       deploymentName,
 			},
 			ModelID:     modelID,
-			MaxReplicas: 10,
+			MaxReplicas: 2,
 			VariantAutoscalingConfigSpec: variantautoscalingv1alpha1.VariantAutoscalingConfigSpec{
 				VariantCost: fmt.Sprintf("%.1f", cost),
 			},

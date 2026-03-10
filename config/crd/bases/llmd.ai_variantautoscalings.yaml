@@ -222,7 +222,7 @@ spec:
                     type: object
                 type: object
               maxReplicas:
-                default: 10
+                default: 2
                 description: |-
                   MaxReplicas is the upper bound on the number of replicas for this variant.
                   The autoscaler will never scale beyond this value regardless of load.
