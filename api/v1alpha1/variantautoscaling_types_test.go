@@ -9,7 +9,6 @@ import (
 	autoscalingv2 "k8s.io/api/autoscaling/v2"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/utils/ptr"
 )
 
 // helper: build a valid VariantAutoscaling object
@@ -281,83 +280,5 @@ func TestMinMaxReplicasJSON(t *testing.T) {
 	}
 	if _, ok := probeSpec.Spec["minReplicas"]; ok {
 		t.Errorf("expected minReplicas to be absent when nil, but it was present")
-	}
-}
-
-func TestBehaviorOmitEmpty(t *testing.T) {
-	va := makeValidVA()
-	// behavior should be absent when nil
-	b, err := json.Marshal(va)
-	if err != nil {
-		t.Fatalf("marshal failed: %v", err)
-	}
-	var probeSpec struct {
-		Spec map[string]any `json:"spec"`
-	}
-	if err := json.Unmarshal(b, &probeSpec); err != nil {
-		t.Fatalf("unmarshal failed: %v", err)
-	}
-	if _, ok := probeSpec.Spec["behavior"]; ok {
-		t.Errorf("expected behavior to be absent when nil, but it was present")
-	}
-}
-
-func TestBehaviorJSONRoundTrip(t *testing.T) {
-	va := makeValidVA()
-	va.Spec.Behavior = &autoscalingv2.HorizontalPodAutoscalerBehavior{
-		ScaleUp: &autoscalingv2.HPAScalingRules{
-			StabilizationWindowSeconds: ptr.To(int32(0)),
-			Policies: []autoscalingv2.HPAScalingPolicy{
-				{
-					Type:          autoscalingv2.PodsScalingPolicy,
-					Value:         4,
-					PeriodSeconds: 60,
-				},
-			},
-		},
-		ScaleDown: &autoscalingv2.HPAScalingRules{
-			StabilizationWindowSeconds: ptr.To(int32(300)),
-			Policies: []autoscalingv2.HPAScalingPolicy{
-				{
-					Type:          autoscalingv2.PercentScalingPolicy,
-					Value:         10,
-					PeriodSeconds: 60,
-				},
-			},
-		},
-	}
-
-	b, err := json.Marshal(va)
-	if err != nil {
-		t.Fatalf("marshal failed: %v", err)
-	}
-
-	var back VariantAutoscaling
-	if err := json.Unmarshal(b, &back); err != nil {
-		t.Fatalf("unmarshal failed: %v", err)
-	}
-
-	if back.Spec.Behavior == nil {
-		t.Fatal("expected behavior to be present after round-trip")
-	}
-	if back.Spec.Behavior.ScaleUp == nil {
-		t.Fatal("expected scaleUp to be present after round-trip")
-	}
-	if *back.Spec.Behavior.ScaleUp.StabilizationWindowSeconds != 0 {
-		t.Errorf("expected scaleUp.stabilizationWindowSeconds=0, got %d",
-			*back.Spec.Behavior.ScaleUp.StabilizationWindowSeconds)
-	}
-	if len(back.Spec.Behavior.ScaleUp.Policies) != 1 {
-		t.Fatalf("expected 1 scaleUp policy, got %d", len(back.Spec.Behavior.ScaleUp.Policies))
-	}
-	if back.Spec.Behavior.ScaleUp.Policies[0].Value != 4 {
-		t.Errorf("expected scaleUp policy value=4, got %d", back.Spec.Behavior.ScaleUp.Policies[0].Value)
-	}
-	if back.Spec.Behavior.ScaleDown == nil {
-		t.Fatal("expected scaleDown to be present after round-trip")
-	}
-	if *back.Spec.Behavior.ScaleDown.StabilizationWindowSeconds != 300 {
-		t.Errorf("expected scaleDown.stabilizationWindowSeconds=300, got %d",
-			*back.Spec.Behavior.ScaleDown.StabilizationWindowSeconds)
 	}
 }

@@ -14,13 +14,6 @@ type VariantAutoscalingConfigSpec struct {
 	// +kubebuilder:validation:Pattern=`^\d+(\.\d+)?$`
 	// +kubebuilder:default="10.0"
 	VariantCost string `json:"variantCost,omitempty"`
-
-	// Behavior configures the HPA scaling behavior policies (scale-up and scale-down).
-	// When omitted, default Kubernetes HPA scaling behavior is used.
-	// Applied directly to HPA, or passed through to KEDA's underlying HPA via
-	// spec.advanced.horizontalPodAutoscalerConfig.behavior.
-	// +kubebuilder:validation:Optional
-	Behavior *autoscalingv2.HorizontalPodAutoscalerBehavior `json:"behavior,omitempty"`
 }
 
 // VariantAutoscalingSpec defines the desired state for autoscaling a model variant.
