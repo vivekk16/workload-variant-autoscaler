@@ -111,10 +111,8 @@ func buildVariantAutoscaling(namespace, name, deploymentName, modelID, accelerat
 				Kind:       "Deployment",
 				Name:       deploymentName,
 			},
-			ModelID: modelID,
-			VariantAutoscalingConfigSpec: variantautoscalingv1alpha1.VariantAutoscalingConfigSpec{
-				VariantCost: fmt.Sprintf("%.1f", cost),
-			},
+			ModelID:     modelID,
+			VariantCost: fmt.Sprintf("%.1f", cost),
 		},
 	}
 }

@@ -881,10 +881,8 @@ func CreateVariantAutoscalingResource(namespace, resourceName, scaleTargetRefNam
 				Kind:       "Deployment",
 				Name:       scaleTargetRefName,
 			},
-			ModelID: modelId,
-			VariantAutoscalingConfigSpec: v1alpha1.VariantAutoscalingConfigSpec{
-				VariantCost: fmt.Sprintf("%.1f", variantCost),
-			},
+			ModelID:     modelId,
+			VariantCost: fmt.Sprintf("%.1f", variantCost),
 		},
 	}
 }
