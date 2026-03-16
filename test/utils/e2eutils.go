@@ -854,7 +854,7 @@ func LogVariantAutoscalingStatus(ctx context.Context, vaName, namespace string, 
 		return err
 	}
 
-	_, err = fmt.Fprintf(writer, "Desired Optimized Allocation for VA: %s - Replicas: %d, Accelerator: %s\n",
+	_, err = fmt.Fprintf(writer, "Desired Optimized Allocation for VA: %s - Replicas: %v, Accelerator: %s\n",
 		variantAutoscaling.Name,
 		variantAutoscaling.Status.DesiredOptimizedAlloc.NumReplicas,
 		variantAutoscaling.Status.DesiredOptimizedAlloc.Accelerator)

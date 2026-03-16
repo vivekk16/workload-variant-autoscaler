@@ -341,7 +341,7 @@ var _ = Describe("Actuator", func() {
 				},
 				Status: llmdVariantAutoscalingV1alpha1.VariantAutoscalingStatus{
 					DesiredOptimizedAlloc: llmdVariantAutoscalingV1alpha1.OptimizedAlloc{
-						NumReplicas: 4,
+						NumReplicas: ctrlutils.Ptr(int32(4)),
 						Accelerator: "A100",
 					},
 				},
@@ -349,7 +349,7 @@ var _ = Describe("Actuator", func() {
 
 			Expect(k8sClient.Create(ctx, deployment)).To(Succeed())
 			Expect(k8sClient.Create(ctx, va)).To(Succeed())
-			va.Status.DesiredOptimizedAlloc.NumReplicas = 4
+			va.Status.DesiredOptimizedAlloc.NumReplicas = ctrlutils.Ptr(int32(4))
 			va.Status.DesiredOptimizedAlloc.Accelerator = "A100"
 		})
 
@@ -359,7 +359,7 @@ var _ = Describe("Actuator", func() {
 		})
 
 		It("should emit metrics successfully when desired replicas > 0", func() {
-			fmt.Printf("Emitting metrics for variantAutoscaling - name: %s\n numReplicas: %d\n", va.Name, va.Status.DesiredOptimizedAlloc.NumReplicas)
+			fmt.Printf("Emitting metrics for variantAutoscaling - name: %s\n numReplicas: %v\n", va.Name, va.Status.DesiredOptimizedAlloc.NumReplicas)
 			err := actuator.EmitMetrics(ctx, va)
 			Expect(err).NotTo(HaveOccurred())
 
@@ -368,9 +368,9 @@ var _ = Describe("Actuator", func() {
 			// but we can verify the method completed without error
 		})
 
-		It("should skip metrics emission when desired replicas is 0", func() {
-			va.Status.DesiredOptimizedAlloc.NumReplicas = 0
-			fmt.Printf("Emitting metrics for variantAutoscaling - name: %s\n numReplicas: %d\n", va.Name, va.Status.DesiredOptimizedAlloc.NumReplicas)
+		It("should skip metrics emission when NumReplicas is nil (no decision)", func() {
+			va.Status.DesiredOptimizedAlloc.NumReplicas = nil
+			fmt.Printf("Emitting metrics for variantAutoscaling - name: %s\n numReplicas: %v\n", va.Name, va.Status.DesiredOptimizedAlloc.NumReplicas)
 			err := actuator.EmitMetrics(ctx, va)
 			Expect(err).NotTo(HaveOccurred())
 
@@ -389,7 +389,7 @@ var _ = Describe("Actuator", func() {
 					Namespace: namespace,
 				}, &dep)
 			}).Should(HaveOccurred())
-			fmt.Printf("Emitting metrics for variantAutoscaling - name: %s\n numReplicas: %d\n", va.Name, va.Status.DesiredOptimizedAlloc.NumReplicas)
+			fmt.Printf("Emitting metrics for variantAutoscaling - name: %s\n numReplicas: %v\n", va.Name, va.Status.DesiredOptimizedAlloc.NumReplicas)
 			err := actuator.EmitMetrics(ctx, va)
 			Expect(err).NotTo(HaveOccurred())
 
@@ -401,7 +401,7 @@ var _ = Describe("Actuator", func() {
 			// This test verifies that metrics emission errors don't fail the method
 			// We can't easily simulate a metrics emission error without mocking,
 			// but we can verify the error handling logic exists
-			fmt.Printf("Emitting metrics for variantAutoscaling - name: %s\n numReplicas: %d\n", va.Name, va.Status.DesiredOptimizedAlloc.NumReplicas)
+			fmt.Printf("Emitting metrics for variantAutoscaling - name: %s\n numReplicas: %v\n", va.Name, va.Status.DesiredOptimizedAlloc.NumReplicas)
 			err := actuator.EmitMetrics(ctx, va)
 			Expect(err).NotTo(HaveOccurred())
 		})
@@ -460,7 +460,7 @@ var _ = Describe("Actuator", func() {
 				},
 				Status: llmdVariantAutoscalingV1alpha1.VariantAutoscalingStatus{
 					DesiredOptimizedAlloc: llmdVariantAutoscalingV1alpha1.OptimizedAlloc{
-						NumReplicas: 3,
+						NumReplicas: ctrlutils.Ptr(int32(3)),
 						Accelerator: "A100",
 					},
 				},
@@ -468,7 +468,7 @@ var _ = Describe("Actuator", func() {
 
 			Expect(k8sClient.Create(ctx, deployment)).To(Succeed())
 			Expect(k8sClient.Create(ctx, va)).To(Succeed())
-			va.Status.DesiredOptimizedAlloc.NumReplicas = 3
+			va.Status.DesiredOptimizedAlloc.NumReplicas = ctrlutils.Ptr(int32(3))
 			va.Status.DesiredOptimizedAlloc.Accelerator = "A100"
 
 		})
@@ -480,20 +480,20 @@ var _ = Describe("Actuator", func() {
 		})
 
 		It("should verify that metrics emitter can emit scaling metrics", func() {
-			fmt.Printf("Emitting scaling metrics for variantAutoscaling - name: %s\n numReplicas: %d\n", va.Name, va.Status.DesiredOptimizedAlloc.NumReplicas)
+			fmt.Printf("Emitting scaling metrics for variantAutoscaling - name: %s\n numReplicas: %v\n", va.Name, va.Status.DesiredOptimizedAlloc.NumReplicas)
 			err := actuator.MetricsEmitter.EmitReplicaScalingMetrics(ctx, va, "up", "optimization")
 			Expect(err).NotTo(HaveOccurred())
 		})
 
 		It("should verify that metrics emitter can emit replica metrics", func() {
-			fmt.Printf("Emitting replica metrics for variantAutoscaling - name: %s\n numReplicas: %d\n", va.Name, va.Status.DesiredOptimizedAlloc.NumReplicas)
+			fmt.Printf("Emitting replica metrics for variantAutoscaling - name: %s\n numReplicas: %v\n", va.Name, va.Status.DesiredOptimizedAlloc.NumReplicas)
 			err := actuator.MetricsEmitter.EmitReplicaMetrics(ctx, va, 1, 3, "A100")
 			Expect(err).NotTo(HaveOccurred())
 		})
 
 		It("should verify full metric emission workflow", func() {
 			// Test the complete workflow
-			fmt.Printf("Emitting metrics for variantAutoscaling - name: %s\n numReplicas: %d\n", va.Name, va.Status.DesiredOptimizedAlloc.NumReplicas)
+			fmt.Printf("Emitting metrics for variantAutoscaling - name: %s\n numReplicas: %v\n", va.Name, va.Status.DesiredOptimizedAlloc.NumReplicas)
 			err := actuator.EmitMetrics(ctx, va)
 			Expect(err).NotTo(HaveOccurred())
 
@@ -520,9 +520,9 @@ var _ = Describe("Actuator", func() {
 					MaxReplicas: 2,
 				},
 				Status: llmdVariantAutoscalingV1alpha1.VariantAutoscalingStatus{
-					// DesiredOptimizedAlloc.NumReplicas will be 0 by default
+					// DesiredOptimizedAlloc.NumReplicas is nil (no decision yet)
 					DesiredOptimizedAlloc: llmdVariantAutoscalingV1alpha1.OptimizedAlloc{
-						NumReplicas: 0, // This should cause EmitMetrics to skip
+						NumReplicas: nil, // This should cause EmitMetrics to skip
 						Accelerator: "A100",
 					},
 				},
@@ -532,9 +532,9 @@ var _ = Describe("Actuator", func() {
 			defer func() {
 				Expect(client.IgnoreNotFound(k8sClient.Delete(ctx, va))).To(Succeed())
 			}()
-			fmt.Printf("Emitting metrics for variantAutoscaling - name: %s\n numReplicas: %d\n", va.Name, va.Status.DesiredOptimizedAlloc.NumReplicas)
+			fmt.Printf("Emitting metrics for variantAutoscaling - name: %s\n numReplicas: %v\n", va.Name, va.Status.DesiredOptimizedAlloc.NumReplicas)
 			err := actuator.EmitMetrics(ctx, va)
-			Expect(err).NotTo(HaveOccurred()) // Should skip metrics emission due to 0 replicas
+			Expect(err).NotTo(HaveOccurred()) // Should skip metrics emission due to nil NumReplicas
 		})
 	})
 
@@ -591,7 +591,7 @@ var _ = Describe("Actuator", func() {
 				},
 				Status: llmdVariantAutoscalingV1alpha1.VariantAutoscalingStatus{
 					DesiredOptimizedAlloc: llmdVariantAutoscalingV1alpha1.OptimizedAlloc{
-						NumReplicas: 5,
+						NumReplicas: ctrlutils.Ptr(int32(5)),
 						Accelerator: "A100",
 					},
 				},
@@ -599,7 +599,7 @@ var _ = Describe("Actuator", func() {
 
 			Expect(k8sClient.Create(ctx, deployment)).To(Succeed())
 			Expect(k8sClient.Create(ctx, va)).To(Succeed())
-			va.Status.DesiredOptimizedAlloc.NumReplicas = 5
+			va.Status.DesiredOptimizedAlloc.NumReplicas = ctrlutils.Ptr(int32(5))
 			va.Status.DesiredOptimizedAlloc.Accelerator = "A100"
 
 		})
