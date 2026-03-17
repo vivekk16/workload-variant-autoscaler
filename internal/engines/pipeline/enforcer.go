@@ -185,3 +185,4 @@ func updateDecisionAction(d *interfaces.VariantDecision, optimizerName string) {
 	}
 	d.Reason = fmt.Sprintf("V2 %s (optimizer: %s, enforced)", d.Action, optimizerName)
 }
+

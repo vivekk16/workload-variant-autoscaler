@@ -35,6 +35,13 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
+func fmtNumReplicas(nr *int32) string {
+	if nr == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("%d", *nr)
+}
+
 var _ = Describe("Actuator", func() {
 	var (
 		ctx          context.Context
@@ -359,7 +366,7 @@ var _ = Describe("Actuator", func() {
 		})
 
 		It("should emit metrics successfully when desired replicas > 0", func() {
-			fmt.Printf("Emitting metrics for variantAutoscaling - name: %s\n numReplicas: %v\n", va.Name, va.Status.DesiredOptimizedAlloc.NumReplicas)
+			fmt.Printf("Emitting metrics for variantAutoscaling - name: %s\n numReplicas: %s\n", va.Name, fmtNumReplicas(va.Status.DesiredOptimizedAlloc.NumReplicas))
 			err := actuator.EmitMetrics(ctx, va)
 			Expect(err).NotTo(HaveOccurred())
 
@@ -370,7 +377,7 @@ var _ = Describe("Actuator", func() {
 
 		It("should skip metrics emission when NumReplicas is nil (no decision)", func() {
 			va.Status.DesiredOptimizedAlloc.NumReplicas = nil
-			fmt.Printf("Emitting metrics for variantAutoscaling - name: %s\n numReplicas: %v\n", va.Name, va.Status.DesiredOptimizedAlloc.NumReplicas)
+			fmt.Printf("Emitting metrics for variantAutoscaling - name: %s\n numReplicas: %s\n", va.Name, fmtNumReplicas(va.Status.DesiredOptimizedAlloc.NumReplicas))
 			err := actuator.EmitMetrics(ctx, va)
 			Expect(err).NotTo(HaveOccurred())
 
@@ -389,7 +396,7 @@ var _ = Describe("Actuator", func() {
 					Namespace: namespace,
 				}, &dep)
 			}).Should(HaveOccurred())
-			fmt.Printf("Emitting metrics for variantAutoscaling - name: %s\n numReplicas: %v\n", va.Name, va.Status.DesiredOptimizedAlloc.NumReplicas)
+			fmt.Printf("Emitting metrics for variantAutoscaling - name: %s\n numReplicas: %s\n", va.Name, fmtNumReplicas(va.Status.DesiredOptimizedAlloc.NumReplicas))
 			err := actuator.EmitMetrics(ctx, va)
 			Expect(err).NotTo(HaveOccurred())
 
@@ -401,7 +408,7 @@ var _ = Describe("Actuator", func() {
 			// This test verifies that metrics emission errors don't fail the method
 			// We can't easily simulate a metrics emission error without mocking,
 			// but we can verify the error handling logic exists
-			fmt.Printf("Emitting metrics for variantAutoscaling - name: %s\n numReplicas: %v\n", va.Name, va.Status.DesiredOptimizedAlloc.NumReplicas)
+			fmt.Printf("Emitting metrics for variantAutoscaling - name: %s\n numReplicas: %s\n", va.Name, fmtNumReplicas(va.Status.DesiredOptimizedAlloc.NumReplicas))
 			err := actuator.EmitMetrics(ctx, va)
 			Expect(err).NotTo(HaveOccurred())
 		})
@@ -480,20 +487,20 @@ var _ = Describe("Actuator", func() {
 		})
 
 		It("should verify that metrics emitter can emit scaling metrics", func() {
-			fmt.Printf("Emitting scaling metrics for variantAutoscaling - name: %s\n numReplicas: %v\n", va.Name, va.Status.DesiredOptimizedAlloc.NumReplicas)
+			fmt.Printf("Emitting scaling metrics for variantAutoscaling - name: %s\n numReplicas: %s\n", va.Name, fmtNumReplicas(va.Status.DesiredOptimizedAlloc.NumReplicas))
 			err := actuator.MetricsEmitter.EmitReplicaScalingMetrics(ctx, va, "up", "optimization")
 			Expect(err).NotTo(HaveOccurred())
 		})
 
 		It("should verify that metrics emitter can emit replica metrics", func() {
-			fmt.Printf("Emitting replica metrics for variantAutoscaling - name: %s\n numReplicas: %v\n", va.Name, va.Status.DesiredOptimizedAlloc.NumReplicas)
+			fmt.Printf("Emitting replica metrics for variantAutoscaling - name: %s\n numReplicas: %s\n", va.Name, fmtNumReplicas(va.Status.DesiredOptimizedAlloc.NumReplicas))
 			err := actuator.MetricsEmitter.EmitReplicaMetrics(ctx, va, 1, 3, "A100")
 			Expect(err).NotTo(HaveOccurred())
 		})
 
 		It("should verify full metric emission workflow", func() {
 			// Test the complete workflow
-			fmt.Printf("Emitting metrics for variantAutoscaling - name: %s\n numReplicas: %v\n", va.Name, va.Status.DesiredOptimizedAlloc.NumReplicas)
+			fmt.Printf("Emitting metrics for variantAutoscaling - name: %s\n numReplicas: %s\n", va.Name, fmtNumReplicas(va.Status.DesiredOptimizedAlloc.NumReplicas))
 			err := actuator.EmitMetrics(ctx, va)
 			Expect(err).NotTo(HaveOccurred())
 
@@ -532,7 +539,7 @@ var _ = Describe("Actuator", func() {
 			defer func() {
 				Expect(client.IgnoreNotFound(k8sClient.Delete(ctx, va))).To(Succeed())
 			}()
-			fmt.Printf("Emitting metrics for variantAutoscaling - name: %s\n numReplicas: %v\n", va.Name, va.Status.DesiredOptimizedAlloc.NumReplicas)
+			fmt.Printf("Emitting metrics for variantAutoscaling - name: %s\n numReplicas: %s\n", va.Name, fmtNumReplicas(va.Status.DesiredOptimizedAlloc.NumReplicas))
 			err := actuator.EmitMetrics(ctx, va)
 			Expect(err).NotTo(HaveOccurred()) // Should skip metrics emission due to nil NumReplicas
 		})
