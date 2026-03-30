@@ -1149,6 +1149,23 @@ deploy_keda() {
     fi
 }
 
+deploy_keda_auth() {
+    if [ "$ENVIRONMENT" != "openshift" ]; then
+        log_info "Skipping KEDA auth setup (only needed on OpenShift)"
+        return
+    fi
+
+    log_info "Deploying KEDA Thanos authentication resources..."
+    local keda_auth_dir="$WVA_PROJECT/config/openshift/keda-auth"
+    if [ ! -d "$keda_auth_dir" ]; then
+        log_warning "KEDA auth kustomization not found at $keda_auth_dir — skipping"
+        return
+    fi
+
+    kustomize build "$keda_auth_dir" | kubectl apply -f -
+    log_success "KEDA Thanos authentication resources deployed"
+}
+
 deploy_prometheus_adapter() {
     log_info "Deploying Prometheus Adapter..."
 
@@ -1458,6 +1475,19 @@ print_summary() {
 }
 
 # Undeployment functions
+undeploy_keda_auth() {
+    if [ "$ENVIRONMENT" != "openshift" ]; then
+        return
+    fi
+
+    log_info "Removing KEDA Thanos authentication resources..."
+    local keda_auth_dir="$WVA_PROJECT/config/openshift/keda-auth"
+    if [ -d "$keda_auth_dir" ]; then
+        kustomize build "$keda_auth_dir" | kubectl delete -f - --ignore-not-found 2>/dev/null || true
+    fi
+    log_success "KEDA Thanos authentication resources removed"
+}
+
 undeploy_keda() {
     log_info "Uninstalling KEDA..."
     helm uninstall keda -n "$KEDA_NAMESPACE" 2>/dev/null || \
@@ -1557,6 +1587,7 @@ cleanup() {
 
     # Undeploy scaler backend (KEDA or Prometheus Adapter)
     if [ "$SCALER_BACKEND" = "keda" ]; then
+        undeploy_keda_auth
         undeploy_keda
     elif [ "$DEPLOY_PROMETHEUS_ADAPTER" = "true" ]; then
         undeploy_prometheus_adapter
@@ -1753,6 +1784,7 @@ main() {
     # (e.g. llmd benchmark clusters with KEDA pre-installed) to avoid conflicts.
     if [ "$SCALER_BACKEND" = "keda" ]; then
         deploy_keda
+        deploy_keda_auth
     elif [ "$SCALER_BACKEND" = "none" ]; then
         log_info "Skipping scaler backend deployment (SCALER_BACKEND=none)"
         log_info "Assumes an external metrics API (e.g. KEDA) is already installed on the cluster"
